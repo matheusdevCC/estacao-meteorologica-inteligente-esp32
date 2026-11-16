@@ -1,31 +1,28 @@
-# Como publicar este projeto no GitHub
+# Atualizacao pelo GitHub Desktop
 
-1. Entre em https://github.com e faça login.
-2. Clique em **New repository**.
-3. Nome sugerido: `estacao-meteorologica-inteligente-esp32`.
-4. Selecione **Public** caso a entrega exija acesso público (ou **Private** se a instituição aceitar).
-5. **Não marque** as opções de criar README, .gitignore ou licença: estes arquivos já vêm no pacote, evitando conflito.
-6. Clique em **Create repository**.
-7. Na página do repositório, escolha **uploading an existing file** ou **Add file > Upload files**.
-8. **Descompacte o ZIP do projeto** e arraste todos os arquivos e pastas para a área de envio. Não envie o ZIP fechado se quiser que o README apareça automaticamente.
-9. Clique em **Commit changes**.
-10. Verifique se as fotos, o diagrama e os dois GIFs aparecem no README. Copie o endereço público para a entrega.
+Repositorio ja criado: https://github.com/matheusdevCC/estacao-meteorologica-inteligente-esp32
 
-## O que ainda pode ser acrescentado
+1. No GitHub Desktop, abra o repositorio `estacao-meteorologica-inteligente-esp32`.
+2. Clique em **Repository > Show in Explorer** para abrir a pasta clonada no Windows.
+3. Extraia o arquivo ZIP desta entrega em uma pasta temporaria (fora do repositorio).
+4. Entre na pasta extraida e copie **o conteudo** (README.md, `codigo/`, `docs/`, `.gitignore`, este guia) para a **raiz** do repositorio clonado, substituindo os arquivos antigos quando solicitado.
+5. NAO copie pastas intermediarias nem mexa na pasta oculta `.git`.
+6. Volte ao GitHub Desktop e confira as alteracoes em **Changes**.
+7. Preencha **Summary** com `Atualizar API, geometria e status MQ-135`.
+8. Clique em **Commit to main**, depois em **Push origin** (ou **Publish branch**, se esse for o botao mostrado no aplicativo).
+9. Acesse o link acima e confira se o `README.md` aparece na pagina inicial e se imagens e GIFs sao exibidos corretamente.
 
-- GIF da montagem física (assim que o vídeo de montagem for enviado).
-- Fotos próximas dos módulos e da alimentação para confirmar o desenho elétrico final.
-- Teste/calibração do BMP280 e do MQ-135, se esses ajustes forem concluídos.
+## Para testar antes da publicacao
 
-## Alternativa via Git
+- Abra `codigo/main.py` no Thonny (interpretador MicroPython/ESP32).
+- O modo padrao `MQ_MODO = 'demonstracao'` exibe **0** no painel, de forma explicitamente identificada como demonstracao. O AO do MQ-135 deve ficar desconectado enquanto nao houver adaptacao eletrica da tensao.
+- Execute com F5 e conecte-se a rede Wi-Fi `Estacao-ESP32` (senha `Estacao2026`).
+- Abra `http://192.168.4.1/` para o painel e `http://192.168.4.1/docs` para a documentacao da API.
+- Abra `http://192.168.4.1/api` para conferir os campos `mq_raw`, `mq_origem` e `mq_status`.
 
-```bash
-git init
-git add .
-git commit -m "Documentacao inicial da estacao meteorologica ESP32"
-git branch -M main
-git remote add origin https://github.com/SEU-USUARIO/estacao-meteorologica-inteligente-esp32.git
-git push -u origin main
-```
+## Limitacoes assumidas na documentacao
 
-Substitua `SEU-USUARIO` pelo perfil de GitHub que criar o repositório; não há link real do repositório até essa etapa.
+- A pressao do BMP280 ainda exige verificacao/calibracao.
+- MQ-135 mostra zero demonstrativo na interface; nao ha medida de gases validada.
+- O mapa e um plano cartesiano local didatico, nao GPS nem mapa de ruas.
+- O servidor roda no proprio ESP32; nao ha banco de dados remoto nesta versao.

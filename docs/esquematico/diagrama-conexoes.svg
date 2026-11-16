@@ -74,25 +74,25 @@
 <text x="92" y="897" class="pin">DO</text>
 <text x="885" y="897" class="esp">GPIO27</text>
 <rect x="60" y="928" width="430" height="182" rx="15" fill="#172d3e" stroke="#38596d" stroke-width="2"/>
-<text x="82" y="964" class="group">MQ-135 | sinal experimental</text>
+<text x="82" y="964" class="group">MQ-135 | circuito em diagnostico</text>
 <line x1="490" y1="997" x2="860" y2="997" stroke="#f87171" stroke-width="4"/>
 <circle cx="490" cy="997" r="5" fill="#f87171"/>
 <circle cx="860" cy="997" r="5" fill="#f87171"/>
 <text x="92" y="1003" class="pin">VCC*</text>
-<text x="885" y="1003" class="esp">3V3</text>
+<text x="885" y="1003" class="esp">5 V / HW-131</text>
 <line x1="490" y1="1040" x2="860" y2="1040" stroke="#b4c2ce" stroke-width="4"/>
 <circle cx="490" cy="1040" r="5" fill="#b4c2ce"/>
 <circle cx="860" cy="1040" r="5" fill="#b4c2ce"/>
 <text x="92" y="1046" class="pin">GND</text>
 <text x="885" y="1046" class="esp">GND</text>
-<line x1="490" y1="1083" x2="860" y2="1083" stroke="#a78bfa" stroke-width="4"/>
+<line x1="490" y1="1083" x2="860" y2="1083" stroke="#a78bfa" stroke-width="4" stroke-dasharray="12 10"/>
 <circle cx="490" cy="1083" r="5" fill="#a78bfa"/>
 <circle cx="860" cy="1083" r="5" fill="#a78bfa"/>
 <text x="92" y="1089" class="pin">AO</text>
-<text x="885" y="1089" class="esp">GPIO34 / ADC</text>
+<text x="885" y="1089" class="esp">GPIO32 / futuro</text>
 <rect x="59" y="1142" width="1360" height="132" rx="15" fill="#f0f5f9"/>
 <text x="82" y="1177" class="note" style="font-weight:700">ATENÇÃO AO MONTAR</text>
-<text x="82" y="1207" class="note">* MQ-135 a 3,3 V: leitura ADC exploratória, sem calibração. A 5 V, AO exige adaptação antes do GPIO34.</text>
-<text x="82" y="1237" class="note">Os rótulos 3V3 e GND representam redes comuns, NÃO múltiplos pinos físicos do ESP32.</text>
-<text x="82" y="1262" class="note">Confira a pinagem do seu módulo e a tensão real dos trilhos antes de energizar.</text>
+<text x="82" y="1207" class="note">* MQ-135 com HW-131 em 5 V: mantenha AO desconectado; futura ligação ao GPIO32 exige adaptação.</text>
+<text x="82" y="1237" class="note">O traço roxo pontilhado representa conexão planejada, NAO o fio instalado atualmente.</text>
+<text x="82" y="1262" class="note">GND do HW-131 e do ESP32 em comum; não unir saídas 3V3 de fontes diferentes.</text>
 </svg>

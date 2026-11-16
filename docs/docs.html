@@ -1,0 +1,20 @@
+<!doctype html><html lang="pt-br"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Documentacao API | ESP32</title>
+<style>body{background:#0b1825;color:#edf5ff;font:15px/1.6 Arial,sans-serif;margin:0}main{max-width:900px;margin:auto;padding:28px 18px}h1{font-size:32px}h2{margin-top:32px;color:#8be8d4}a{color:#80dac8}code,pre{background:#162b3b;border:1px solid #315269;border-radius:7px}code{padding:3px 6px}pre{padding:17px;overflow:auto;white-space:pre-wrap;word-break:break-word}table{width:100%;border-collapse:collapse}td,th{text-align:left;border-bottom:1px solid #315269;padding:9px}small{color:#bad1df}.pill{display:inline-block;background:#20564c;padding:6px 12px;border-radius:20px}</style>
+</head><body><main><a href="/">Voltar ao dashboard</a><h1>Documentacao da API HTTP</h1>
+<p class="pill">Versao 1.2 | MicroPython ESP32 | JSON</p>
+<p>API embarcada no ESP32, disponivel apenas para clientes ligados a rede <b>Estacao-ESP32</b>.</p>
+<h2>Rotas disponiveis</h2><table><tr><th>Metodo</th><th>Rota</th><th>Descricao</th></tr>
+<tr><td>GET</td><td><a href="/">/</a></td><td>Dashboard para consulta local</td></tr>
+<tr><td>GET</td><td><a href="/api">/api</a></td><td>Leituras atuais em JSON</td></tr>
+<tr><td>GET</td><td><a href="/api/status">/api/status</a></td><td>Estado e identificacao da estacao</td></tr>
+<tr><td>GET</td><td><a href="/api/geometria?x=30&y=40">/api/geometria?x=30&amp;y=40</a></td><td>Vetor, distancia e angulo em plano 2D</td></tr>
+<tr><td>GET</td><td><a href="/docs">/docs</a></td><td>Esta documentacao</td></tr></table>
+<h2>Exemplo atual: GET /api</h2><p>Resposta atual obtida do dispositivo (sem valores inventados):</p>
+<pre id="json">Buscando dados...</pre>
+<h2>Geometria analitica</h2><p>A estacao e a origem S = (0, 0) e o ponto ilustrativo P = (x, y). O vetor e <b>(x-0, y-0)</b>, a distancia e <b>raiz(dx*dx + dy*dy)</b> e o angulo e <b>atan2(dy,dx)</b> em graus.</p>
+<p>Exemplo de geometria para P = (30,40): <a href="/api/geometria?x=30&y=40">abrir JSON</a>.</p>
+<h2>Limites e avisos</h2><p>O plano 2D e didatico, nao utiliza GPS. No modo demonstracao, o valor 0 do MQ-135 e sinalizado como demonstrativo, nao como leitura real. Um sinal ADC real exige nivel eletrico seguro e nao indica ppm. A pressao barometrica continua em diagnostico.</p>
+<p><small>Captura sugerida para a entrega: fotografe esta pagina com a tabela de rotas e o JSON preenchido.</small></p>
+<script>fetch('/api',{cache:'no-store'}).then(r=>r.json()).then(d=>document.getElementById('json').textContent=JSON.stringify(d,null,2)).catch(e=>document.getElementById('json').textContent='API temporariamente indisponivel');</script>
+</main></body></html>

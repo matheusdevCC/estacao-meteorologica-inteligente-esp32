@@ -1,0 +1,72 @@
+<!doctype html><html lang="pt-br"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Estacao Meteorologica | Acesso do cidadao</title>
+<style>
+:root{--bg:#091827;--card:#10293d;--edge:#284b62;--txt:#eef7ff;--mut:#a6c0d1;--a:#5ee2c6}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;color:var(--txt);font:15px/1.5 Arial,sans-serif;background:linear-gradient(130deg,#173550,var(--bg) 50%)}
+main{max-width:1100px;padding:28px 18px 60px;margin:auto}nav{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:26px}
+nav a,a{color:var(--a);text-decoration:none}nav b{margin-right:auto;font-size:14px;letter-spacing:.05em}
+h1{font-size:clamp(28px,5vw,43px);margin:4px 0 8px}.sub{color:var(--mut);margin:0 0 22px}
+.pill{display:inline-block;padding:7px 13px;border-radius:20px;background:#17463e;color:#a9ffe7;font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:20px 0 24px}
+.card,.panel{background:#112b3e;border:1px solid var(--edge);border-radius:16px;padding:21px;min-width:0}
+.label{color:var(--mut);font-size:13px}.val{font-size:clamp(27px,4vw,39px);font-weight:750;margin:12px 0 4px}
+.unit{font-size:16px;font-weight:400;color:var(--mut)}.note{font-size:12px;color:var(--mut)}.warning{color:#ffd392}
+.bar{height:7px;background:#294558;border-radius:9px;overflow:hidden;margin:12px 0}.fill{height:100%;width:0;background:var(--a)}
+h2{font-size:21px;margin:0 0 9px}.geogrid{display:grid;grid-template-columns:1.4fr 1fr;gap:20px}
+canvas{width:100%;height:auto;border:1px solid #36576c;background:#091b2b;border-radius:11px;cursor:crosshair}
+.controls{display:flex;flex-wrap:wrap;gap:12px;margin:17px 0 8px}
+.controls label{font-size:12px;color:var(--mut)}input{display:block;background:#061624;color:white;border:1px solid #54748c;border-radius:6px;padding:8px;width:105px;margin-top:4px}
+.metric{background:#092132;padding:13px;border-radius:10px;margin:12px 0}.metric strong{font-size:24px;display:block;margin-top:5px}
+footer{font-size:12px;color:var(--mut);margin-top:22px;line-height:1.7}
+@media(max-width:750px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.geogrid{grid-template-columns:1fr}}
+@media(max-width:480px){.grid{grid-template-columns:1fr}main{padding:18px 12px}.card,.panel{padding:16px}}
+</style></head><body><main>
+<nav><b>UNIP &middot; ESTACAO ESP32</b><a href="#indicadores">Indicadores</a><a href="#mapa">Plano 2D</a><a href="/docs">Documentacao da API</a></nav>
+<h1>Estacao Meteorologica Inteligente</h1><p class="sub">Painel de consulta local para o cidadao &middot; ESP32 / MicroPython</p><div class="pill" id="status">Conectando...</div>
+<section class="grid" id="indicadores">
+<div class="card"><div class="label">Temperatura ambiente | DHT22</div><div class="val"><span id="temp">--</span> <span class="unit">&deg;C</span></div><div class="note">Leitura automatica</div></div>
+<div class="card"><div class="label">Umidade relativa | DHT22</div><div class="val"><span id="umid">--</span> <span class="unit">%</span></div><div class="note">Umidade do ar</div></div>
+<div class="card"><div class="label">Temperatura auxiliar | BMP280</div><div class="val"><span id="tempbmp">--</span> <span class="unit">&deg;C</span></div><div class="note">Sensor barometrico</div></div>
+<div class="card"><div class="label">Pressao atmosferica | BMP280</div><div class="val"><span id="pressao">--</span> <span class="unit">hPa</span></div><div id="pressaonota" class="note warning">Em diagnostico</div></div>
+<div class="card"><div class="label">Luminosidade | LDR</div><div id="luz" class="val">--</div><div class="note">Deteccao de claro/escuro</div></div>
+<div class="card"><div class="label">MQ-135 | Sinal experimental</div><div class="val"><span id="mq">--</span> <span class="unit">/4095</span></div><div class="bar"><div id="fill" class="fill"></div></div><div id="mqnota" class="note">Aguardando sinal</div></div>
+</section>
+<section class="panel" id="mapa"><h2>Geometria analitica &middot; Mapa cartesiano 2D</h2><p class="sub">Clique no plano ou altere as coordenadas do ponto de consulta.</p>
+<div class="geogrid"><div><canvas id="plano" width="720" height="330"></canvas><div class="controls"><label>Posicao X (m)<input type="number" id="x" value="30" min="-100" max="100"></label><label>Posicao Y (m)<input type="number" id="y" value="40" min="-50" max="50"></label></div></div>
+<div><div class="metric"><span class="label">Estacao de referencia</span><strong>S (0, 0)</strong></div>
+<div class="metric"><span class="label">Vetor de posicao</span><strong id="vetor">--</strong></div>
+<div class="metric"><span class="label">Distancia euclidiana</span><strong id="distancia">--</strong></div>
+<div class="metric"><span class="label">Angulo em relacao ao eixo X</span><strong id="angulo">--</strong></div>
+<p class="note warning">Representacao didatica em metros. Este plano nao mostra localizacao geografica real, GPS nem um mapa de ruas.</p></div></div></section>
+<footer><div id="rodape">Atualizacao automatica a cada 3 segundos.</div><div>Acesso disponivel apenas a dispositivos conectados ao Wi-Fi do ESP32. Para acesso pela internet seria necessario um servidor publico.</div></footer>
+</main><script>
+const $=id=>document.getElementById(id);const cv=$('plano'),ctx=cv.getContext('2d');
+function fmt(x,n){return x===null||x===undefined?'--':Number(x).toFixed(n).replace('.',',')}
+function plot(x,y){return [360+x*2.95,165-y*2.9]}
+function desenhar(x,y){ctx.clearRect(0,0,720,330);ctx.fillStyle='#091b2b';ctx.fillRect(0,0,720,330);
+ctx.strokeStyle='#274258';ctx.lineWidth=1;for(let i=-100;i<=100;i+=20){let px=plot(i,0)[0];ctx.beginPath();ctx.moveTo(px,0);ctx.lineTo(px,330);ctx.stroke();}
+for(let j=-50;j<=50;j+=10){let py=plot(0,j)[1];ctx.beginPath();ctx.moveTo(0,py);ctx.lineTo(720,py);ctx.stroke();}
+ctx.strokeStyle='#678da7';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,165);ctx.lineTo(720,165);ctx.moveTo(360,0);ctx.lineTo(360,330);ctx.stroke();
+ctx.fillStyle='#a7c4d8';ctx.font='13px Arial';ctx.fillText('X (m)',660,182);ctx.fillText('Y (m)',370,18);
+let p=plot(x,y);ctx.strokeStyle='#5ee2c6';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(360,165);ctx.lineTo(p[0],p[1]);ctx.stroke();
+ctx.fillStyle='#71d8f9';ctx.beginPath();ctx.arc(360,165,7,0,Math.PI*2);ctx.fill();ctx.fillStyle='#5ee2c6';ctx.beginPath();ctx.arc(p[0],p[1],7,0,Math.PI*2);ctx.fill();
+ctx.fillStyle='#e6f6ff';ctx.font='bold 14px Arial';ctx.fillText('S (0,0)',369,185);
+ctx.fillText('P ('+x+','+y+')',Math.min(p[0]+10,630),Math.max(p[1]-12,16));}
+function coords(){const x=Number($('x').value),y=Number($('y').value);if(!Number.isFinite(x)||!Number.isFinite(y)||x < -100||x>100||y < -50||y>50){return null;}return {x,y};}
+async function atualizarGeometria(){const p=coords();if(!p){$('vetor').textContent='Coordenadas fora do plano';return;}desenhar(p.x,p.y);
+try{let r=await fetch('/api/geometria?x='+p.x+'&y='+p.y,{cache:'no-store'});if(!r.ok)throw Error('API');let d=await r.json();
+$('vetor').textContent='('+fmt(d.vetor.dx,1)+', '+fmt(d.vetor.dy,1)+') m';$('distancia').textContent=fmt(d.distancia_m,2)+' m';$('angulo').textContent=fmt(d.angulo_graus,1)+' graus';
+}catch(e){$('vetor').textContent='Sem conexao';$('distancia').textContent='--';$('angulo').textContent='--';}}
+cv.addEventListener('click',e=>{let r=cv.getBoundingClientRect(),px=(e.clientX-r.left)*720/r.width,py=(e.clientY-r.top)*330/r.height;
+$('x').value=Math.max(-100,Math.min(100,Math.round((px-360)/2.95)));$('y').value=Math.max(-50,Math.min(50,Math.round((165-py)/2.9)));atualizarGeometria();});
+$('x').addEventListener('change',atualizarGeometria);$('y').addEventListener('change',atualizarGeometria);
+async function atualizar(){try{let r=await fetch('/api?ts='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('HTTP');let d=await r.json();
+$('temp').textContent=fmt(d.dht_temp,1);$('umid').textContent=fmt(d.umidade,1);$('tempbmp').textContent=fmt(d.bmp_temp,2);
+$('pressao').textContent=fmt(d.pressao,2);$('pressaonota').textContent=d.pressao_status;$('luz').textContent=d.ldr||'--';
+$('mq').textContent=d.mq_raw===null?'--':d.mq_raw;$('fill').style.width=(d.mq_percent_adc||0)+'%';$('mqnota').textContent=d.mq_status;
+$('status').textContent='Ao vivo | Atualizando a cada 3 segundos';$('rodape').textContent='ESP32 ligado ha '+d.tempo_s+' segundos | Fonte: GET /api';
+}catch(e){$('status').textContent='Sem conexao com o ESP32';}}
+desenhar(30,40);atualizar();atualizarGeometria();setInterval(atualizar,3000);
+</script></body></html>
